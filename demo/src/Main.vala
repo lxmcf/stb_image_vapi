@@ -65,7 +65,7 @@ public int init () {
 
 public Texture load_texture (string filename) {
     int width, height, bytes_per_pixel;
-    void* pixel_data = Stbi.load (filename, out width, out height, out bytes_per_pixel, 4);
+    void* pixel_data = Stbi.load (filename, out width, out height, out bytes_per_pixel, Stbi.Channels.RGB_ALPHA);
 
     Texture texture = Texture.create (
         sdl_renderer, PixelRAWFormat.ABGR8888, TextureAccess.STATIC, width, height
