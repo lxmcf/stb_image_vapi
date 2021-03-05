@@ -1,13 +1,17 @@
 [CCode (cprefix = "stbi_", cheader_filename = "stb_image.h")]
 namespace Stbi {
-    public const int STBI_VERSION;
-
-    public enum Components {
-        DEFAULT = 0,
-        GREY = 1,
-        GREY_ALPHA = 2,
-        RGB = 3,
-        RGB_ALPHA = 4
+    [CCode (cname = "int" , cprefix = "STBI_")]
+    enum Channels {
+        [CCode (cname = "STBI_default")]
+        DEFAULT,
+        [CCode (cname = "STBI_grey")]
+        GREY,
+        [CCode (cname = "STBI_grey_alpha")]
+        GREY_ALPHA,
+        [CCode (cname = "STBI_rgb")]
+        RGB,
+        [CCode (cname = "STBI_rgb_alpha")]
+        RGB_ALPHA
     }
 
     /**
@@ -32,12 +36,12 @@ namespace Stbi {
      * @param string File to load
      * @param int Returns the image width
      * @param int Returns the image height
-     * @param int Returns the bytes per pixel
+     * @param int Returns the amount of colour channels
      * @param int Requested amount of image components
      * @return Generic pointer to image pixel data
      */
     [CCode (cname = "stbi_load")]
-    public static void* load (string file, out int width, out int height, out int bpp, int desired_channels = 4);
+    public static void* load (string file, out int width, out int height, out int channels, int desired_channels = 4);
 
     /**
      * Loads an image filestream and returns a generic pointer.
@@ -50,12 +54,12 @@ namespace Stbi {
      * @param GLib.FileStream FileStream to load
      * @param int Returns the image width
      * @param int Returns the image height
-     * @param int Returns the bytes per pixel
+     * @param int Returns the amount of colour channels
      * @param int Requested amount of image components
      * @return Generic pointer to image pixel data
      */
     [CCode (cname = "stbi_load_from_file")]
-    public static void* load_from_filestream (GLib.FileStream file, out int width, out int height, out int bpp, int desired_channels = 4);
+    public static void* load_from_filestream (GLib.FileStream file, out int width, out int height, out int channels, int desired_channels = 4);
 
     /**
      * Loads an image buffer and returns a generic pointer.
@@ -68,12 +72,43 @@ namespace Stbi {
      * @param void* File buffer to load
      * @param int Returns the image width
      * @param int Returns the image height
-     * @param int Returns the bytes per pixel
+     * @param int Returns the amount of colour channels
      * @param int Requested amount of image components
      * @return Generic pointer to image pixel data
      */
     [CCode (cname = "stbi_load_from_memory")]
     public static void* load_from_memory (void* mem, int length, out int width, out int height, out int bpp, int desired_channels = 4);
+
+    /*
+     * Loads file info from given filename.
+     *
+     * This function takes in a file and outputs the width, height and channel count and will return 1 on success.
+     *
+     *
+     * @param string File to load
+     * @param int Returns the image width
+     * @param int Returns the image height
+     * @param int Returns the amount of colour channels
+     * @@return int Returns an integer based on file load
+     */
+     [CCode (cname = "stbi_info")]
+     public static int load_info (string file, out int width, out int height, out int channels);
+
+    /*
+     * Loads file info from given filestream.
+     *
+     * This function takes in a file and outputs the width, height and channel count and will return 1 on success.
+     *
+     *
+     * @see @Stbi.load_info
+     * @param string File to load
+     * @param int Returns the image width
+     * @param int Returns the image height
+     * @param int Returns the amount of colour channels
+     * @return int Returns an integer based on file load
+     */
+     [CCode (cname = "stbi_info_from_file")]
+     public static int load_info_from_filestream (GLib.FileStream file, out int width, out int height, out int channels);
 
     /**
      * Sets the HDR to LDR gamma used when loading HDR images with Stbi.load ();
