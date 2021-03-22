@@ -14,6 +14,13 @@ namespace Stbi {
         RGB_ALPHA
     }
 
+    ////////////////////////////////////
+    //
+    //
+    // 8-bits-per-channel interface
+    //
+    ////////////////////////////////////
+
     /**
      * Loads an image file and returns a generic pointer.
      *
@@ -41,7 +48,7 @@ namespace Stbi {
      * @return Generic pointer to image pixel data
      */
     [CCode (cname = "stbi_load")]
-    public static void* load (string file, out int width, out int height, out int channels, int desired_channels = 4);
+    public static uchar* load (string file, out int width, out int height, out int channels, int desired_channels = 4);
 
     /**
      * Loads an image filestream and returns a generic pointer.
@@ -59,7 +66,7 @@ namespace Stbi {
      * @return Generic pointer to image pixel data
      */
     [CCode (cname = "stbi_load_from_file")]
-    public static void* load_from_filestream (GLib.FileStream file, out int width, out int height, out int channels, int desired_channels = 4);
+    public static uchar* load_from_filestream (GLib.FileStream file, out int width, out int height, out int channels, int desired_channels = 4);
 
     /**
      * Loads an image buffer and returns a generic pointer.
@@ -77,7 +84,84 @@ namespace Stbi {
      * @return Generic pointer to image pixel data
      */
     [CCode (cname = "stbi_load_from_memory")]
-    public static void* load_from_memory (void* mem, int length, out int width, out int height, out int bpp, int desired_channels = 4);
+    public static uchar* load_from_memory (void* mem, int length, out int width, out int height, out int bpp, int desired_channels = 4);
+
+    ////////////////////////////////////
+    //
+    // 16-bits-per-channel interface
+    //
+    ////////////////////////////////////
+
+    /**
+     * Loads an image file and returns a generic pointer.
+     *
+     * This function takes in a file and returns a generic pointer while outputting image data.
+     * However this function has the below imitations as part of stb_image:
+     * * No 12 bits per chanel JPEG
+     * * No JPEGs with arithmetic coding
+     * * GIF always returns 4 bits per pixel
+     *
+     * As this function return's a generic pointer, the memory will need to manually free'd like below:
+     *
+     * {{{
+     *  void* pixel_data = Stbi.load ("example.png", out width, out height, out bpp);
+     *
+     *  // Image processing code
+     *
+     *  delete pixel_data;
+     * }}}
+     *
+     * @param string File to load
+     * @param int Returns the image width
+     * @param int Returns the image height
+     * @param int Returns the amount of colour channels
+     * @param int Requested amount of image components
+     * @return Generic pointer to image pixel data
+     */
+    [CCode (cname = "stbi_load_16")]
+    public static uchar* load_16 (string file, out int width, out int height, out int channels, int desired_channels = 4);
+
+     /**
+      * Loads an image filestream and returns a generic pointer.
+      *
+      * This function takes in a file and returns a generic pointer while outputting image data.
+      * This function inherits the same limitations as Stbi.load_16 ();
+      *
+      *
+      * @see Stbi.load
+      * @param GLib.FileStream FileStream to load
+      * @param int Returns the image width
+      * @param int Returns the image height
+      * @param int Returns the amount of colour channels
+      * @param int Requested amount of image components
+      * @return Generic pointer to image pixel data
+      */
+    [CCode (cname = "stbi_load_from_file_16")]
+    public static uchar* load_16_from_filestream (GLib.FileStream file, out int width, out int height, out int channels, int desired_channels = 4);
+
+     /**
+      * Loads an image buffer and returns a generic pointer.
+      *
+      * This function takes in a file and returns a generic pointer while outputting image data.
+      * This function inherits the same limitations as Stbi.load_16 ();
+      *
+      *
+      * @see Stbi.load
+      * @param void* File buffer to load
+      * @param int Returns the image width
+      * @param int Returns the image height
+      * @param int Returns the amount of colour channels
+      * @param int Requested amount of image components
+      * @return Generic pointer to image pixel data
+      */
+     [CCode (cname = "stbi_load_16_from_memory")]
+     public static uchar* load_16_from_memory (void* mem, int length, out int width, out int height, out int bpp, int desired_channels = 4);
+
+    ////////////////////////////////////
+    //
+    // Load info
+    //
+    ////////////////////////////////////
 
     /*
      * Loads file info from given filename.
@@ -91,8 +175,8 @@ namespace Stbi {
      * @param int Returns the amount of colour channels
      * @@return int Returns an integer based on file load
      */
-     [CCode (cname = "stbi_info")]
-     public static int load_info (string file, out int width, out int height, out int channels);
+    [CCode (cname = "stbi_info")]
+    public static int load_info (string file, out int width, out int height, out int channels);
 
     /*
      * Loads file info from given filestream.
@@ -107,8 +191,14 @@ namespace Stbi {
      * @param int Returns the amount of colour channels
      * @return int Returns an integer based on file load
      */
-     [CCode (cname = "stbi_info_from_file")]
-     public static int load_info_from_filestream (GLib.FileStream file, out int width, out int height, out int channels);
+    [CCode (cname = "stbi_info_from_file")]
+    public static int load_info_from_filestream (GLib.FileStream file, out int width, out int height, out int channels);
+
+    ///////////////////////////////////
+    //
+    // High Dynamic Range (HDR)
+    //
+    ////////////////////////////////////
 
     /**
      * Sets the HDR to LDR gamma used when loading HDR images with Stbi.load ();
@@ -172,7 +262,8 @@ namespace Stbi {
     /**
      * Returns whether the provided file is HDR or not.
      *
-     * @param bool If file is HDR
+     * @param string The file to check
+     * @return bool If file is HDR
      */
     [CCode (cname = "stbi_is_hdr")]
     public static bool is_file_hdr (string file);
@@ -180,10 +271,47 @@ namespace Stbi {
     /**
      * Returns whether the provided file stream is HDR or not.
      *
-     * @param bool If file stream is HDR
+     * @param GLib.FileStream The filestream to check
+     * @return bool If file is HDR
      */
     [CCode (cname = "stbi_is_hdr_from_file")]
     public static bool is_file_hdr_from_filestream (GLib.FileStream file);
+
+    /**
+     * Returns whether the provided memory is HDR or not.
+     *
+     * @param GLib.FileStream The filestream to check
+     * @return bool If file is HDR
+     */
+    [CCode (cname = "stbi_is_hdr_from_memory")]
+    public static bool is_file_hdr_from_memory (void* mem, int length);
+
+    /**
+     * Returns whether the provided file is 16 bit or not.
+     *
+     * @param string The file to check
+     * @return bool If file is 16 bit
+     */
+    [CCode (cname = "stbi_is_16_bit")]
+    public static bool is_file_16_bit (string file);
+
+    /**
+     * Returns whether the provided file is 16 bit or not.
+     *
+     * @param GLib.FileStream The filestream to check
+     * @return bool If file is 16 bit
+     */
+    [CCode (cname = "stbi_is_16_bit_from_file")]
+    public static bool is_file_16_bit_from_filestream (GLib.FileStream file);
+
+    /**
+     * Returns whether the provided file is 16 bit or not.
+     *
+     * @param void* The memory to check
+     * @return bool If file is 16 bit
+     */
+    [CCode (cname = "stbi_is_16_bit_from_memory")]
+    public static bool is_file_16_bit_from_memory (void* mem, int length);
 
     /**
      * Free's memory returned from file loading functions.
